@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Constructor Guiado de Rúbricas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f9fafb;
+        }
+        .step-nav-item {
+            transition: all 0.2s ease-in-out;
+        }
+        .step-nav-item.active {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+            border-left-color: #1d4ed8; /* blue-700 */
+        }
+        .step-nav-item.completed {
+            background-color: #22c55e; /* green-500 */
+            color: white;
+        }
+        .step-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        .step-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #final-rubric-container table, #descriptors-table-container table {
+            table-layout: fixed;
+            width: 100%;
+        }
+        #final-rubric-container th, #final-rubric-container td, 
+        #descriptors-table-container th, #descriptors-table-container td {
+            border: 1px solid #e5e7eb;
+            padding: 12px;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="max-w-7xl mx-auto p-4 md:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Los 6 Pasos para Crear una Rúbrica que Funciona</h1>
+            <p class="mt-3 text-lg text-gray-600">Sigue esta guía interactiva para construir un borrador de tu propia rúbrica paso a paso.</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <!-- Barra de Navegación de Pasos -->
+            <aside class="md:col-span-1">
+                <ul id="step-navigation" class="space-y-2">
+                    <li id="nav-step-1" class="step-nav-item active font-semibold p-4 rounded-lg border-l-4 border-gray-300 bg-white shadow-sm">Paso 1: El Propósito</li>
+                    <li id="nav-step-2" class="step-nav-item font-semibold p-4 rounded-lg border-l-4 border-gray-300 bg-white shadow-sm">Paso 2: La Tarea</li>
+                    <li id="nav-step-3" class="step-nav-item font-semibold p-4 rounded-lg border-l-4 border-gray-300 bg-white shadow-sm">Paso 3: Los Criterios</li>
+                    <li id="nav-step-4" class="step-nav-item font-semibold p-4 rounded-lg border-l-4 border-gray-300 bg-white shadow-sm">Paso 4: Los Niveles</li>
+                    <li id="nav-step-5" class="step-nav-item font-semibold p-4 rounded-lg border-l-4 border-gray-300 bg-white shadow-sm">Paso 5: Los Descriptores</li>
+                    <li id="nav-step-6" class="step-nav-item font-semibold p-4 rounded-lg border-l-4 border-gray-300 bg-white shadow-sm">Paso 6: Revisar y Usar</li>
+                </ul>
+            </aside>
+
+            <!-- Contenido de los Pasos -->
+            <main class="md:col-span-3 bg-white p-8 rounded-lg shadow-lg">
+                <!-- Paso 1 -->
+                <div id="step-1" class="step-content active">
+                    <h2 class="text-2xl font-bold mb-4">Paso 1: Define el Propósito</h2>
+                    <p class="mb-6">Todo empieza con el fin en mente. ¿Qué habilidad o conocimiento fundamental quieres que tus estudiantes demuestren? Este es tu resultado de aprendizaje.</p>
+                    <label for="learning-outcome" class="block font-medium text-gray-700">Escribe el resultado de aprendizaje que esta rúbrica evaluará:</label>
+                    <textarea id="learning-outcome" rows="3" class="w-full mt-2 p-2 border rounded-md" placeholder="Ej: El estudiante analiza críticamente fuentes primarias para construir un argumento histórico coherente."></textarea>
+                </div>
+                <!-- Paso 2 -->
+                <div id="step-2" class="step-content">
+                    <h2 class="text-2xl font-bold mb-4">Paso 2: Describe la Tarea</h2>
+                    <p class="mb-6">Ahora, define la actividad específica que los estudiantes realizarán para demostrar ese aprendizaje. Sé claro y conciso.</p>
+                    <label for="task-description" class="block font-medium text-gray-700">Nombre o descripción de la tarea de evaluación:</label>
+                    <input type="text" id="task-description" class="w-full mt-2 p-2 border rounded-md" placeholder="Ej: Ensayo argumentativo sobre la Revolución Industrial.">
+                </div>
+                <!-- Paso 3 -->
+                <div id="step-3" class="step-content">
+                    <h2 class="text-2xl font-bold mb-4">Paso 3: Establece los Criterios</h2>
+                    <p class="mb-6">¿Cuáles son los componentes clave que definen un trabajo de calidad para esta tarea? Estos son tus criterios. Intenta usar entre 3 y 5.</p>
+                    <label for="criterion-input" class="block font-medium text-gray-700">Añade tus criterios uno por uno:</label>
+                    <div class="flex mt-2">
+                        <input type="text" id="criterion-input" class="w-full p-2 border rounded-l-md" placeholder="Ej: Tesis y Argumento">
+                        <button id="add-criterion-btn" class="bg-blue-500 text-white px-4 py-2 rounded-r-md hover:bg-blue-600">Añadir</button>
+                    </div>
+                    <ul id="criteria-list" class="mt-4 space-y-2"></ul>
+                </div>
+                <!-- Paso 4 -->
+                <div id="step-4" class="step-content">
+                    <h2 class="text-2xl font-bold mb-4">Paso 4: Define los Niveles de Desempeño</h2>
+                    <p class="mb-6">Crea una escala para medir la calidad. ¿Cómo se ven los diferentes grados de éxito? Nombra cada nivel, del más alto al más bajo.</p>
+                    <label for="level-input" class="block font-medium text-gray-700">Añade tus niveles de desempeño (Ej: Sobresaliente, Bueno, Aceptable):</label>
+                    <div class="flex mt-2">
+                        <input type="text" id="level-input" class="w-full p-2 border rounded-l-md" placeholder="Ej: Sobresaliente">
+                        <button id="add-level-btn" class="bg-blue-500 text-white px-4 py-2 rounded-r-md hover:bg-blue-600">Añadir</button>
+                    </div>
+                    <ul id="levels-list" class="mt-4 space-y-2"></ul>
+                </div>
+                <!-- Paso 5 -->
+                <div id="step-5" class="step-content">
+                    <h2 class="text-2xl font-bold mb-4">Paso 5: Redacta los Descriptores</h2>
+                    <p class="mb-6">Este es el corazón de la rúbrica. Para cada celda, describe con un lenguaje claro y observable cómo se ve ese criterio en ese nivel específico.</p>
+                    <div id="descriptors-table-container" class="overflow-x-auto"></div>
+                </div>
+                <!-- Paso 6 -->
+                <div id="step-6" class="step-content">
+                    <h2 class="text-2xl font-bold mb-4">Paso 6: ¡Revisa y Usa tu Rúbrica!</h2>
+                    <p class="mb-6">¡Felicidades! Aquí tienes el borrador de tu rúbrica. Revísala cuidadosamente y, si estás listo, cópiala para usarla en tus documentos.</p>
+                    <div id="final-rubric-container" class="p-4 border rounded-lg bg-gray-50"></div>
+                    <button id="copy-rubric-btn" class="mt-6 bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600">Copiar Tabla de Rúbrica</button>
+                    <span id="copy-feedback" class="ml-4 font-semibold" style="display:none;"></span>
+                </div>
+
+                <!-- Botones de Navegación -->
+                <div class="mt-8 flex justify-between">
+                    <button id="prev-btn" class="bg-gray-300 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-400" style="display: none;">Anterior</button>
+                    <button id="next-btn" class="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 ml-auto">Siguiente</button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let currentStep = 1;
+            const totalSteps = 6;
+
+            const rubricData = {
+                outcome: '',
+                task: '',
+                criteria: [],
+                levels: [],
+                descriptors: {}
+            };
+
+            const nextBtn = document.getElementById('next-btn');
+            const prevBtn = document.getElementById('prev-btn');
+
+            function updateStepView() {
+                document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+                document.getElementById(`step-${currentStep}`).classList.add('active');
+
+                document.querySelectorAll('.step-nav-item').forEach((el, index) => {
+                    el.classList.remove('active', 'completed');
+                    if (index + 1 < currentStep) {
+                        el.classList.add('completed');
+                    } else if (index + 1 === currentStep) {
+                        el.classList.add('active');
+                    }
+                });
+
+                prevBtn.style.display = currentStep > 1 ? 'inline-block' : 'none';
+                nextBtn.textContent = currentStep === totalSteps ? 'Finalizar' : 'Siguiente';
+                 if (currentStep === totalSteps) {
+                   nextBtn.style.display = 'none';
+                } else {
+                   nextBtn.style.display = 'inline-block';
+                }
+
+                if (currentStep === 5) generateDescriptorsTable();
+                if (currentStep === 6) renderFinalRubric();
+            }
+
+            function addToList(type) {
+                const input = document.getElementById(`${type}-input`);
+                const listId = type === 'criterion' ? 'criteria-list' : 'levels-list';
+                const list = document.getElementById(listId);
+                const value = input.value.trim();
+                
+                if (value === '' || !list) return;
+
+                const dataArray = type === 'criterion' ? rubricData.criteria : rubricData.levels;
+                dataArray.push(value);
+                
+                const li = document.createElement('li');
+                li.className = 'flex justify-between items-center bg-gray-100 p-2 rounded';
+                
+                const textSpan = document.createElement('span');
+                textSpan.textContent = value;
+                li.appendChild(textSpan);
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Eliminar';
+                deleteBtn.className = 'text-red-500 text-sm hover:text-red-700 ml-4';
+                deleteBtn.onclick = () => {
+                    const index = dataArray.indexOf(value);
+                    if (index > -1) {
+                        dataArray.splice(index, 1);
+                    }
+                    li.remove();
+                };
+                
+                li.appendChild(deleteBtn);
+                list.appendChild(li);
+                input.value = '';
+                input.focus();
+            }
+
+            document.getElementById('add-criterion-btn').onclick = () => addToList('criterion');
+            document.getElementById('add-level-btn').onclick = () => addToList('level');
+
+            function generateDescriptorsTable() {
+                const container = document.getElementById('descriptors-table-container');
+                if (rubricData.criteria.length === 0 || rubricData.levels.length === 0) {
+                    container.innerHTML = '<p class="text-center text-gray-500">Por favor, añade al menos un criterio y un nivel en los pasos anteriores.</p>';
+                    return;
+                }
+
+                let table = '<table class="min-w-full"><thead><tr><th class="p-2 border"></th>';
+                rubricData.levels.forEach(level => {
+                    table += `<th class="p-2 border">${level}</th>`;
+                });
+                table += '</tr></thead><tbody>';
+                rubricData.criteria.forEach((criterion, i) => {
+                    table += `<tr><td class="font-semibold p-2 border">${criterion}</td>`;
+                    rubricData.levels.forEach((level, j) => {
+                        const key = `${i}-${j}`;
+                        const text = rubricData.descriptors[key] || '';
+                        table += `<td class="p-1 border"><textarea data-key="${key}" class="w-full h-24 p-1 border rounded" placeholder="Describe '${criterion}' en el nivel '${level}'...">${text}</textarea></td>`;
+                    });
+                    table += '</tr>';
+                });
+                table += '</tbody></table>';
+                container.innerHTML = table;
+
+                container.querySelectorAll('textarea').forEach(textarea => {
+                    textarea.addEventListener('input', (e) => {
+                        rubricData.descriptors[e.target.dataset.key] = e.target.value;
+                    });
+                });
+            }
+
+            function renderFinalRubric() {
+                 const container = document.getElementById('final-rubric-container');
+                 const outcome = document.getElementById('learning-outcome').value;
+                 const task = document.getElementById('task-description').value;
+
+                 let content = `<div class="mb-4">
+                                <p><strong>Resultado de Aprendizaje:</strong> ${outcome || '(No definido)'}</p>
+                                <p><strong>Tarea:</strong> ${task || '(No definida)'}</p>
+                              </div>`;
+                 
+                 content += '<table class="min-w-full border-collapse"><thead><tr><th class="bg-gray-100">Criterios</th>';
+                 rubricData.levels.forEach(level => {
+                    content += `<th class="bg-gray-100">${level}</th>`;
+                 });
+                 content += '</tr></thead><tbody>';
+                 rubricData.criteria.forEach((criterion, i) => {
+                    content += `<tr><td class="font-semibold align-top">${criterion}</td>`;
+                    rubricData.levels.forEach((level, j) => {
+                        const key = `${i}-${j}`;
+                        const text = rubricData.descriptors[key] || ' ';
+                        content += `<td class="align-top text-sm">${text.replace(/\n/g, '<br>')}</td>`;
+                    });
+                    content += '</tr>';
+                 });
+                 content += '</tbody></table>';
+                 container.innerHTML = content;
+            }
+
+            // --- FUNCIÓN DE COPIAR CORREGIDA ---
+            document.getElementById('copy-rubric-btn').addEventListener('click', () => {
+                const rubricContainer = document.getElementById('final-rubric-container');
+                const feedback = document.getElementById('copy-feedback');
+
+                // Crear un 'range' para seleccionar el contenido del contenedor
+                const range = document.createRange();
+                range.selectNode(rubricContainer);
+                
+                // Obtener la selección actual del navegador y limpiarla
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                
+                // Añadir nuestro nuevo 'range' a la selección
+                selection.addRange(range);
+
+                try {
+                    // Ejecutar el comando de copiado
+                    const successful = document.execCommand('copy');
+                    
+                    if (successful) {
+                        feedback.textContent = '¡Copiado!';
+                        feedback.style.color = '#16a34a'; // green-600
+                    } else {
+                        feedback.textContent = 'Error al copiar.';
+                        feedback.style.color = '#dc2626'; // red-600
+                    }
+                } catch (err) {
+                    feedback.textContent = 'Error al copiar.';
+                    feedback.style.color = '#dc2626'; // red-600
+                }
+
+                // Mostrar el mensaje de feedback y luego ocultarlo
+                feedback.style.display = 'inline';
+                setTimeout(() => {
+                    feedback.style.display = 'none';
+                }, 2500);
+
+                // Limpiar la selección para que el usuario no vea el contenido resaltado
+                selection.removeAllRanges();
+            });
+
+
+            nextBtn.addEventListener('click', () => {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    updateStepView();
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateStepView();
+                }
+            });
+
+            updateStepView();
+        });
+    </script>
+</body>
+</html>
